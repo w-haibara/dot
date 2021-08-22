@@ -1,3 +1,3 @@
-module github.com/w-haibara/dot
+module github.com/w-haibara/v2d
 
 go 1.17
