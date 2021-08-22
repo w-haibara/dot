@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"io"
 	"reflect"
-	"strconv"
 )
 
 type Dot struct {
@@ -21,35 +20,39 @@ func (d *Dot) Render(w io.Writer, values ...interface{}) error {
 	par := -1
 	id := par
 
-	var fn func(int, reflect.Value)
-	fn = func(par int, v reflect.Value) {
+	var fn func(int, reflect.Value, string)
+	fn = func(par int, v reflect.Value, label string) {
 		id++
-
-		addChildlen(w, par, id, v.String())
 
 		t := v.Type()
 		if t.Kind() != reflect.Struct {
+			addChild(w, par, id, v)
 			return
 		}
 
+		if label != "" {
+			label = ":" + label
+		}
+		addChild(w, par, id, t.Name()+label)
+
 		id := id
 		for _, f := range reflect.VisibleFields(t) {
-			fn(id, v.FieldByIndex(f.Index))
+			fn(id, v.FieldByIndex(f.Index), f.Tag.Get("label"))
 		}
 	}
 
 	for _, val := range values {
-		fn(par, reflect.ValueOf(val))
+		fn(par, reflect.ValueOf(val), "")
 	}
 
 	return nil
 }
 
-func addChildlen(w io.Writer, id1, id2 int, label string) {
+func addChild(w io.Writer, id1, id2 int, label interface{}) {
 	if id1 < 0 {
-		fmt.Fprintln(w, "	"+strconv.Itoa(id2)+`[label="`+label+`"];`)
+		fmt.Fprintf(w, `	%d[label="%v"];`+"\n", id2, label)
 		return
 	}
 
-	fmt.Fprintln(w, "	"+strconv.Itoa(id2)+`[label="`+label+`"];`+"\n	"+strconv.Itoa(id1)+"->"+strconv.Itoa(id2)+";")
+	fmt.Fprintf(w, `	%d[label="%v"];`+"\n"+`	%d->%d`+"\n", id2, label, id1, id2)
 }

@@ -6,28 +6,28 @@ import (
 	"github.com/w-haibara/v2d"
 )
 
-type t1 struct {
-	v1 int
-	v2 bool
+type T1 struct {
+	V1 int
+	V2 bool
 }
 
-type t2 struct {
-	v1 t1
-	v2 t1
-	v3 string
+type T2 struct {
+	V1 T1 `label:"v1"`
+	V2 T1 `label:"v2"`
+	V3 string
 }
 
 func main() {
-	v := t2{
-		v1: t1{
-			v1: 0,
-			v2: false,
+	v := T2{
+		V1: T1{
+			V1: 0,
+			V2: false,
 		},
-		v2: t1{
-			v1: 1,
-			v2: true,
+		V2: T1{
+			V1: 1,
+			V2: true,
 		},
-		v3: "foo",
+		V3: "foo",
 	}
 
 	d := v2d.NewDot()
