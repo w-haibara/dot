@@ -1,0 +1,9 @@
+out: *.go go.mod
+	go mod tidy
+	go fmt ./...
+	go vet ./...
+	go build -o out ./...
+
+.PHONY:
+run: out
+	./out
